@@ -9,7 +9,7 @@ COPY config.yaml /app/dtm/configs/
 RUN ls /app/dtm/configs/
 
 COPY ./sqls/dtmcli.barrier.mysql.sql /
-COPY ./sqls/dtmcli.barrier.mysql.sql /
+COPY ./sqls/dtmsvr.storage.mysql.sql /
 
 COPY .docker-tmp/consul /usr/bin/consul
 
