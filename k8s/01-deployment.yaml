@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dtm-cluster
+  namespace: kube-system
+  labels:
+    app: dtm-cluster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dtm-cluster
+  template:
+    metadata:
+      labels:
+        app: dtm-cluster
+    spec:
+      containers:
+        - name: dtm-cluster
+          image: uhub.service.ucloud.cn/entropypool/dtm:1.8.4
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-c=/app/dtm/configs/config.yaml"
+          ports:
+            - containerPort: 36789
+              protocol: TCP
+              name: http
+            - containerPort: 36790
+              protocol: TCP
+              name: grpc
+          livenessProbe:
+            httpGet:
+              path: /api/ping
+              port: 36789
+              scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /api/ping
+              port: 36789
+              scheme: HTTP
+          env:
+            - name: ENV_ENVIRONMENT_TARGET
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.target
+            - name: ENV_CONSUL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.consul_host
+            - name: ENV_CONSUL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.consul_port
+            - name: ENV_CLUSTER_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
