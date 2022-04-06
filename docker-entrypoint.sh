@@ -21,8 +21,6 @@ fi
 
 MYSQL_HOST=`echo $MYSQL_HOST | sed 's/"//g'`
 
-MYSQL_PASSWORD=`kubectl get secret --namespace "kube-system" mysql-password-secret -o jsonpath="{.data.rootpassword}" | base64 --decode`
-
 
 mysql -uroot -p$MYSQL_PASSWORD -h $MYSQL_HOST < /dtmcli.barrier.mysql.sql
 mysql -uroot -p$MYSQL_PASSWORD -h $MYSQL_HOST < /dtmsvr.storage.mysql.sql
