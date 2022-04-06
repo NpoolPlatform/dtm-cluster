@@ -18,7 +18,7 @@ spec:
       containers:
         - name: dtm-cluster
           image: uhub.service.ucloud.cn/entropypool/dtm:1.8.4
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args:
             - "-c=/app/dtm/configs/config.yaml"
           ports:
