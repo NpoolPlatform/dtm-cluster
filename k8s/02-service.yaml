@@ -10,11 +10,9 @@ spec:
     - port: 36790
       targetPort: 36790
       name: grpc
-      appProtocol: grpc # Kubernetes v1.20 [stable]，低版本请剔除此行
     - port: 36789
       targetPort: 36789
       name: http
-      appProtocol: http # Kubernetes v1.20 [stable]，低版本请剔除此行
   selector:
     app: dtm-cluster
   type: ClusterIP
