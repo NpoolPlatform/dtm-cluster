@@ -32,3 +32,5 @@ ls /app/dtm/configs/
 sed -i "s/HOST/$MYSQL_HOST/g" /app/dtm/configs/config.yaml
 sed -i "s/PORT/$MYSQL_PORT/g" /app/dtm/configs/config.yaml
 sed -i "s/PWD/$MYSQL_PASSWORD/g" /app/dtm/configs/config.yaml
+
+/app/dtm/dtm
