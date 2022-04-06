@@ -17,3 +17,5 @@ RUN mkdir -p /usr/local/bin
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
 
+ENTRYPOINT ["docker-entrypoint.sh"]
+

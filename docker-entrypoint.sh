@@ -1,4 +1,5 @@
 #!/bin/sh
+echo "start*****************"
 echo $ENV_CLUSTER_NAMESPACE
 CONSUL_HTTP_ADDR=${ENV_CONSUL_HOST}:${ENV_CONSUL_PORT} consul services register -address=dtm.${ENV_CLUSTER_NAMESPACE}.svc.cluster.local -name=dtm.npool.top -port=36790
 if [ ! $? -eq 0 ]; then
@@ -33,3 +34,5 @@ ls /app/dtm/configs/
 sed -i "s/HOST/$MYSQL_HOST/g" /app/dtm/configs/config.yaml
 sed -i "s/PORT/$MYSQL_PORT/g" /app/dtm/configs/config.yaml
 sed -i "s/PWD/$MYSQL_PASSWORD/g" /app/dtm/configs/config.yaml
+
+exec "$@"
