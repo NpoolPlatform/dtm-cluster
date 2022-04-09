@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: dtm-cluster-svc
+  name: dtm-cluster
   namespace: kube-system
   labels:
     app: dtm-cluster
