@@ -19,8 +19,6 @@ spec:
         - name: dtm-cluster
           image: uhub.service.ucloud.cn/entropypool/dtm:1.8.4
           imagePullPolicy: Always
-          args:
-            - "-c=/app/dtm/configs/config.yaml"
           ports:
             - containerPort: 36789
               protocol: TCP

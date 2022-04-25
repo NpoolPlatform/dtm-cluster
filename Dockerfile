@@ -7,7 +7,7 @@ RUN apk add mysql-client
 COPY config.yaml /app/dtm/configs/
 
 
-RUN chmod -R 777 /app/dtm/configs/config.yaml
+RUN chmod a+r /app/dtm/configs/config.yaml
 
 COPY ./sqls/dtmcli.barrier.mysql.sql /
 COPY ./sqls/dtmsvr.storage.mysql.sql /
