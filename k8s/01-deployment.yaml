@@ -19,9 +19,6 @@ spec:
         - name: dtm-cluster
           image: uhub.service.ucloud.cn/entropypool/dtm:1.8.4
           imagePullPolicy: Always
-          volumeMounts:
-            - mountPath: /app/dtm/configs
-              name: config
           ports:
             - containerPort: 36789
               protocol: TCP
@@ -64,23 +61,3 @@ spec:
                 secretKeyRef:
                   name: mysql-password-secret
                   key: rootpassword
-      volumes:
-        - name: config
-          configMap:
-            name: dtm-conf
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: dtm-conf
-  namespace: kube-system
-  labels:
-    app: dtm
-data:
-  config.yaml: |-
-    Store:
-      Driver: mysql
-      Host: HOST
-      Port: PORT
-      User: root
-      Password: PWD
