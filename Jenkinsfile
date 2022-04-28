@@ -53,6 +53,12 @@ pipeline {
       }
     }
 
+    stage('Config dtm mysql') {
+      steps {
+        sh './config.sh'
+      }
+    }
+
     stage('Deploy dtm cluster') {
       when {
         expression { DEPLOY_TARGET == 'true' }

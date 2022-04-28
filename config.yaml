@@ -1,6 +1,0 @@
-Store:
-  Driver: mysql
-  Host: HOST
-  Port: PORT
-  User: root
-  Password: PWD

@@ -20,10 +20,6 @@ fi
 
 MYSQL_HOST=`echo $MYSQL_HOST | sed 's/"//g'`
 
-
-mysql -uroot -p$MYSQL_PASSWORD -h $MYSQL_HOST < /dtmcli.barrier.mysql.sql
-mysql -uroot -p$MYSQL_PASSWORD -h $MYSQL_HOST < /dtmsvr.storage.mysql.sql
-
 if [ ! $? -eq 0 ]; then
   echo "FAIL TO IMPORT SQL FILE with options $MYSQL_HOST $MYSQL_PORT"
 fi
