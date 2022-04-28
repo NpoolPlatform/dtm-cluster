@@ -55,7 +55,6 @@ pipeline {
 
     stage('Config dtm mysql') {
       steps {
-        sh 'ls'
         sh './config.sh'
       }
     }
