@@ -73,6 +73,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: dtm-conf
+  namespace: kube-system
   labels:
     app: dtm
 data:
