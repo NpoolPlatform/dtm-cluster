@@ -27,7 +27,7 @@ mysql -uroot -p$MYSQL_PASSWORD -h $MYSQL_HOST < /dtmsvr.storage.mysql.sql
 if [ ! $? -eq 0 ]; then
   echo "FAIL TO IMPORT SQL FILE with options $MYSQL_HOST $MYSQL_PORT"
 fi
-ls /app/dtm/configs/
+
 sed -i "s/HOST/$MYSQL_HOST/g" /app/dtm/configs/config.yaml
 sed -i "s/PORT/$MYSQL_PORT/g" /app/dtm/configs/config.yaml
 sed -i "s/PWD/$MYSQL_PASSWORD/g" /app/dtm/configs/config.yaml

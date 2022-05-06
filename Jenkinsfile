@@ -1,11 +1,5 @@
 pipeline {
   agent any
-  environment {
-    GOPROXY = 'https://goproxy.cn,direct'
-  }
-  tools {
-    go 'go'
-  }
   stages {
     stage('Clone dtm cluster') {
       steps {
@@ -18,14 +12,11 @@ pipeline {
         expression { BUILD_TARGET == 'true' }
       }
       steps {
-        sh 'mkdir -p .docker-tmp; cp /usr/bin/consul .docker-tmp'
-        sh(returnStdout: true, script: '''
-          images=`docker images | grep entropypool | grep dtm | awk '{ print $3 }'`
-          for image in $images; do
-            docker rmi $image
-          done
-        '''.stripIndent())
-        sh 'docker build -t uhub.service.ucloud.cn/entropypool/dtm:1.8.4 .'
+        sh '''
+          mkdir -p .docker-tmp
+          cp /usr/bin/consul .docker-tmp
+          docker build -t uhub.service.ucloud.cn/entropypool/dtm:1.8.4 .
+        '''
       }
     }
 
@@ -41,7 +32,9 @@ pipeline {
             if [ $? -eq 0 ]; then
               break
             fi
+            sleep 1;
           done
+          docker rmi uhub.service.ucloud.cn/entropypool/dtm:1.8.4
           set -e
         '''.stripIndent())
       }
