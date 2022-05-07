@@ -1,6 +1,6 @@
 FROM yedf/dtm:1.8.4
 
-RUN apk add curl jq mysql-client
+RUN apk add --no-cache curl jq mysql-client
 
 COPY config.yaml /app/dtm/configs/
 
