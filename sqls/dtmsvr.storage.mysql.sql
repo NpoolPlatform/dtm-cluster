@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS dtm.trans_branch_op (
   `id` bigint(22) NOT NULL AUTO_INCREMENT,
   `gid` varchar(128) NOT NULL COMMENT '事务全局id',
   `url` varchar(1024) NOT NULL COMMENT '动作关联的url',
-  `data` TEXT COMMENT '请求所携带的数据',
   `bin_data` BLOB COMMENT 'grpc的二进制数据',
   `branch_id` VARCHAR(128) NOT NULL COMMENT '事务分支ID',
   `op` varchar(45) NOT NULL COMMENT '事务分支类型 saga_action | saga_compensate | xa',
