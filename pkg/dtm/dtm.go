@@ -3,6 +3,7 @@ package dtm
 import (
 	"context"
 	"fmt"
+	"net"
 
 	constant "github.com/NpoolPlatform/dtm-cluster/pkg/const"
 
@@ -44,7 +45,7 @@ func (act *Action) ConstructURI(ctx context.Context) error {
 	return nil
 }
 
-func WithDTM(ctx context.Context, actions []*Action, pre, post func(ctx context.Context) error) error {
+func WithSage(ctx context.Context, actions []*Action, pre, post func(ctx context.Context) error) error {
 	if pre != nil {
 		if err := pre(ctx); err != nil {
 			return fmt.Errorf("fail run pre: %v", err)
@@ -55,8 +56,8 @@ func WithDTM(ctx context.Context, actions []*Action, pre, post func(ctx context.
 	if err != nil {
 		return fmt.Errorf("fail peek dtm service: %v", err)
 	}
-	host := fmt.Sprintf("%v:%v", svc.Address, svc.Port)
 
+	host := net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
 	gid := dtmgrpc.MustGenGid(host)
 
 	saga := dtmgrpc.NewSagaGrpc(host, gid)
