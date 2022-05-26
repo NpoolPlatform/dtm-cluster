@@ -45,7 +45,7 @@ func (act *Action) ConstructURI(ctx context.Context) error {
 	return nil
 }
 
-func WithSage(ctx context.Context, actions []*Action, pre, post func(ctx context.Context) error) error {
+func WithSaga(ctx context.Context, actions []*Action, pre, post func(ctx context.Context) error) error {
 	if pre != nil {
 		if err := pre(ctx); err != nil {
 			return fmt.Errorf("fail run pre: %v", err)
