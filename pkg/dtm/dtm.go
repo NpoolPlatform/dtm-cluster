@@ -46,7 +46,9 @@ func (act *Action) ConstructURI(ctx context.Context) error {
 
 func WithDTM(ctx context.Context, actions []*Action, pre, post func(ctx context.Context) error) error {
 	if pre != nil {
-		pre(ctx)
+		if err := pre(ctx); err != nil {
+			return fmt.Errorf("fail run pre: %v", err)
+		}
 	}
 
 	svc, err := config.PeekService(constant.ServiceName, grpc2.GRPCTAG)
