@@ -1,4 +1,4 @@
-FROM yedf/dtm:1.8.4
+FROM yedf/dtm:1.14.0
 
 RUN apk add --no-cache curl jq mysql-client
 
