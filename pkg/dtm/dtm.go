@@ -29,6 +29,14 @@ type Action struct {
 	uri         uri
 }
 
+type SAGADispose struct {
+	Config struct {
+		WaitResult    bool
+		TimeoutToFail int64
+	}
+	Action []*Action
+}
+
 func (act *Action) ConstructURI(ctx context.Context) error {
 	api, err := apimgrcli.GetServiceMethodAPI(ctx, act.ServiceName, act.Action)
 	if err != nil || api == nil {
@@ -52,7 +60,7 @@ func (act *Action) ConstructURI(ctx context.Context) error {
 	return nil
 }
 
-func WithSaga(ctx context.Context, actions []*Action, pre, post func(ctx context.Context) error) error {
+func WithSaga(ctx context.Context, dispose *SAGADispose, pre, post func(ctx context.Context) error) error {
 	if pre != nil {
 		if err := pre(ctx); err != nil {
 			return fmt.Errorf("fail run pre: %v", err)
@@ -67,13 +75,16 @@ func WithSaga(ctx context.Context, actions []*Action, pre, post func(ctx context
 	host := net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
 	gid := dtmgrpc.MustGenGid(host)
 	saga := dtmgrpc.NewSagaGrpc(host, gid)
-	for _, act := range actions {
+	for _, act := range dispose.Action {
 		if err := act.ConstructURI(ctx); err != nil {
 			return fmt.Errorf("fail construct action uri: %v", err)
 		}
 		saga = saga.Add(act.uri.action, act.uri.revert, act.Param)
 	}
-	saga.WaitResult = true
+	saga.WaitResult = dispose.Config.WaitResult
+	if dispose.Config.TimeoutToFail != 0 {
+		saga.TimeoutToFail = dispose.Config.TimeoutToFail
+	}
 
 	err = saga.Submit()
 	if err != nil {
