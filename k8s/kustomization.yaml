@@ -1,3 +1,4 @@
 resources:
   - 01-deployment.yaml
   - 02-service.yaml
+  - 03-traefik-vpn-ingress.yaml

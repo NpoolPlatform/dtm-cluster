@@ -34,13 +34,20 @@ func (act *Action) ConstructURI(ctx context.Context) error {
 	if err != nil || api == nil {
 		return fmt.Errorf("fail get service method api: %v", err)
 	}
-	act.uri.action = act.ServiceName + "/" + api.Path
+
+	svc, err := config.PeekService(act.ServiceName, grpc2.GRPCTAG)
+	if err != nil {
+		return fmt.Errorf("fail peek dtm service: %v", err)
+	}
+	host := net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
+
+	act.uri.action = host + "/" + api.Path
 
 	api, err = apimgrcli.GetServiceMethodAPI(ctx, act.ServiceName, act.Revert)
 	if err != nil || api == nil {
 		return fmt.Errorf("fail get service method api: %v", err)
 	}
-	act.uri.revert = act.ServiceName + "/" + api.Path
+	act.uri.revert = host + "/" + api.Path
 
 	return nil
 }
@@ -59,7 +66,6 @@ func WithSaga(ctx context.Context, actions []*Action, pre, post func(ctx context
 
 	host := net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
 	gid := dtmgrpc.MustGenGid(host)
-
 	saga := dtmgrpc.NewSagaGrpc(host, gid)
 	for _, act := range actions {
 		if err := act.ConstructURI(ctx); err != nil {

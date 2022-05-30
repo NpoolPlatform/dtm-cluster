@@ -1,5 +1,5 @@
 #!/bin/sh
-CONSUL_HTTP_ADDR=${ENV_CONSUL_HOST}:${ENV_CONSUL_PORT} consul services register -address=dtm-cluster.${ENV_CLUSTER_NAMESPACE}.svc.cluster.local -name=dtm-cluster.npool.top -port=36790
+CONSUL_HTTP_ADDR=${ENV_CONSUL_HOST}:${ENV_CONSUL_PORT} consul services register -address=dtm-cluster.${ENV_CLUSTER_NAMESPACE}.svc.cluster.local -name=dtm-cluster.npool.top -port=36790 -tag=GRPCTAG
 
 if [ ! $? -eq 0 ]; then
   echo "FAIL TO REGISTER CONFIGSERVICE TO CONSUL"
