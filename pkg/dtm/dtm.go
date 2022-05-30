@@ -12,6 +12,7 @@ import (
 
 	apimgrcli "github.com/NpoolPlatform/api-manager/pkg/client"
 
+	"github.com/dtm-labs/dtmcli/dtmimp"
 	"github.com/dtm-labs/dtmgrpc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -27,6 +28,11 @@ type Action struct {
 	Revert      string
 	Param       protoreflect.ProtoMessage
 	uri         uri
+}
+
+type SagaDispose struct {
+	TransOptions dtmimp.TransOptions
+	Actions      []*Action
 }
 
 func (act *Action) ConstructURI(ctx context.Context) error {
@@ -52,7 +58,7 @@ func (act *Action) ConstructURI(ctx context.Context) error {
 	return nil
 }
 
-func WithSaga(ctx context.Context, actions []*Action, pre, post func(ctx context.Context) error) error {
+func WithSaga(ctx context.Context, dispose *SagaDispose, pre, post func(ctx context.Context) error) error {
 	if pre != nil {
 		if err := pre(ctx); err != nil {
 			return fmt.Errorf("fail run pre: %v", err)
@@ -67,13 +73,13 @@ func WithSaga(ctx context.Context, actions []*Action, pre, post func(ctx context
 	host := net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
 	gid := dtmgrpc.MustGenGid(host)
 	saga := dtmgrpc.NewSagaGrpc(host, gid)
-	for _, act := range actions {
+	for _, act := range dispose.Actions {
 		if err := act.ConstructURI(ctx); err != nil {
 			return fmt.Errorf("fail construct action uri: %v", err)
 		}
 		saga = saga.Add(act.uri.action, act.uri.revert, act.Param)
 	}
-	saga.WaitResult = true
+	saga.TransOptions = dispose.TransOptions
 
 	err = saga.Submit()
 	if err != nil {
