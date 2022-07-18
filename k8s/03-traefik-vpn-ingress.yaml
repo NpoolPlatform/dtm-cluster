@@ -11,7 +11,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.middlewares: kube-system-common-headers@kubernetescrd
 spec:
   rules:
-    - host: dtm.internal-devops.development.npool.top
+    - host: dtm.development.npool.top
       http:
         paths:
           - path: /
