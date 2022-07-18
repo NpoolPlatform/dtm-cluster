@@ -51,7 +51,7 @@ pipeline {
         expression { DEPLOY_TARGET == 'true' }
       }
       steps {
-        sh 'sed -i "s/dtm.internal-devops.development.npool.top/dtm.internal-devops.$TARGET_ENV.npool.top/g" ./k8s/03-traefik-vpn-ingress.yaml'
+        sh 'sed -i "s/dtm.development.npool.top/dtm.$TARGET_ENV.npool.top/g" ./k8s/03-traefik-vpn-ingress.yaml'
         sh 'kubectl apply -k k8s'
       }
     }
