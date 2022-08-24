@@ -31,11 +31,19 @@ spec:
               path: /api/ping
               port: 36789
               scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /api/ping
               port: 36789
               scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 200m
+              memory: 200Mi
           env:
             - name: ENV_ENVIRONMENT_TARGET
               valueFrom:

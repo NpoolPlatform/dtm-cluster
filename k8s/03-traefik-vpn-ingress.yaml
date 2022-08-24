@@ -1,7 +1,7 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: dtm-ingress
+  name: dtm-cluster-ingress
   namespace: kube-system
   annotations:
     k8s.kuboard.cn/displayName: dtm
@@ -15,6 +15,9 @@ spec:
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: dtm-cluster
-              servicePort: http
+              service:
+                name: dtm-cluster-svc
+                port:
+                  number: 36789

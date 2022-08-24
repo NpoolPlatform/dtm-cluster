@@ -10,9 +10,11 @@ spec:
     - port: 36790
       targetPort: 36790
       name: grpc
+      appProtocol: grpc
     - port: 36789
       targetPort: 36789
       name: http
+      appProtocol: http
   selector:
     app: dtm-cluster
   type: ClusterIP
