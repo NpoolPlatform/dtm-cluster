@@ -1,20 +1,23 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: consul-webui-ingress
+  name: dtm-cluster-ingress
   namespace: kube-system
   annotations:
-    k8s.kuboard.cn/displayName: consul
-    k8s.kuboard.cn/workload: consul
+    k8s.kuboard.cn/displayName: dtm
+    k8s.kuboard.cn/workload: dtm
     kubernetes.io/ingress.class: "traefik-internet-vpn"
     traefik.ingress.kubernetes.io/router.entrypoints: websecure, web
     traefik.ingress.kubernetes.io/router.middlewares: kube-system-common-headers@kubernetescrd
 spec:
   rules:
-    - host: dtm.internal-devops.development.npool.top
+    - host: dtm.development.npool.top
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: dtm-cluster
-              servicePort: http
+              service:
+                name: dtm-cluster-svc
+                port:
+                  number: 36789
