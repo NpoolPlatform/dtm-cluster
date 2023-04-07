@@ -123,6 +123,7 @@ func WithSaga(ctx context.Context, dispose *SagaDispose) error {
 		saga = saga.Add(act.uri.action, act.uri.revert, act.Args)
 	}
 	saga.TransOptions = dispose.TransOptions
+	saga.SetConcurrent()
 
 	err := saga.Submit()
 	if err != nil {
