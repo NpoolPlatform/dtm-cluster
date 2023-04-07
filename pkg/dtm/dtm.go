@@ -31,13 +31,28 @@ type Action struct {
 	ServiceName string
 	Action      string
 	Revert      string
-	Param       proto.Message
+	Args        proto.Message
 	uri         uri
 }
 
 type SagaDispose struct {
 	TransOptions dtmimp.TransOptions
 	Actions      []*Action
+}
+
+func NewSagaDispose(options dtmimp.TransOptions) *SagaDispose {
+	return &SagaDispose{
+		TransOptions: options,
+	}
+}
+
+func (sd *SagaDispose) Add(svcName, action, revert string, args proto.Message) {
+	sd.Actions = append(sd.Actions, &Action{
+		ServiceName: svcName,
+		Action:      action,
+		Revert:      revert,
+		Args:        args,
+	})
 }
 
 var apiMap sync.Map
@@ -105,7 +120,7 @@ func WithSaga(ctx context.Context, dispose *SagaDispose) error {
 		if err := act.constructURI(ctx); err != nil {
 			return fmt.Errorf("fail construct action uri: %v", err)
 		}
-		saga = saga.Add(act.uri.action, act.uri.revert, act.Param)
+		saga = saga.Add(act.uri.action, act.uri.revert, act.Args)
 	}
 	saga.TransOptions = dispose.TransOptions
 
