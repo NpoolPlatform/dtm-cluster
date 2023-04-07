@@ -6,13 +6,13 @@ require (
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20230406095906-83a0750e1787
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20220621110548-8f3f8049ecc5
+	github.com/NpoolPlatform/message v0.0.0-20230407030149-3bc54926f671
 	github.com/dtm-labs/dtmcli v1.13.5
 	github.com/dtm-labs/dtmgrpc v1.13.5
 	google.golang.org/protobuf v1.28.1
 )
 
 require (
-	github.com/NpoolPlatform/message v0.0.0-20230406095503-3b7bf0f1a6a9 // indirect
 	github.com/Shonminh/apollo-client v0.4.0 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
