@@ -4,17 +4,22 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"sync"
 
 	constant "github.com/NpoolPlatform/dtm-cluster/pkg/const"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 
-	apimgrcli "github.com/NpoolPlatform/api-manager/pkg/client"
+	apimwcli "github.com/NpoolPlatform/basal-middleware/pkg/client/api"
+	apimgrpb "github.com/NpoolPlatform/message/npool/basal/mgr/v1/api"
+
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	commonpb "github.com/NpoolPlatform/message/npool"
 
 	"github.com/dtm-labs/dtmcli/dtmimp"
 	"github.com/dtm-labs/dtmgrpc"
-	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/proto"
 )
 
 type uri struct {
@@ -26,7 +31,7 @@ type Action struct {
 	ServiceName string
 	Action      string
 	Revert      string
-	Param       protoreflect.ProtoMessage
+	Args        proto.Message
 	uri         uri
 }
 
@@ -35,59 +40,95 @@ type SagaDispose struct {
 	Actions      []*Action
 }
 
-func (act *Action) ConstructURI(ctx context.Context) error {
-	api, err := apimgrcli.GetServiceMethodAPI(ctx, act.ServiceName, act.Action)
-	if err != nil || api == nil {
-		return fmt.Errorf("fail get service method api: %v", err)
+func NewSagaDispose(options dtmimp.TransOptions) *SagaDispose {
+	return &SagaDispose{
+		TransOptions: options,
+	}
+}
+
+func (sd *SagaDispose) Add(svcName, action, revert string, args proto.Message) {
+	sd.Actions = append(sd.Actions, &Action{
+		ServiceName: svcName,
+		Action:      action,
+		Revert:      revert,
+		Args:        args,
+	})
+}
+
+var apiMap sync.Map
+var hostMap sync.Map
+
+func (act *Action) apiKey(action string) string {
+	return fmt.Sprintf("%v:%v", act.ServiceName, action)
+}
+
+func (act *Action) constructURI(ctx context.Context) (err error) {
+	api, ok := apiMap.Load(act.apiKey(act.Action))
+	if !ok {
+		api, err = apimwcli.GetAPIOnly(ctx, &apimgrpb.Conds{
+			ServiceName: &commonpb.StringVal{Op: cruder.EQ, Value: act.ServiceName},
+			Path:        &commonpb.StringVal{Op: cruder.EQ, Value: act.Action},
+		})
+		if err != nil || api == nil {
+			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Action, err)
+		}
+		apiMap.Store(act.apiKey(act.Action), api)
 	}
 
-	svc, err := config.PeekService(act.ServiceName, grpc2.GRPCTAG)
-	if err != nil {
-		return fmt.Errorf("fail peek dtm service: %v", err)
+	host, ok := hostMap.Load(act.ServiceName)
+	if !ok {
+		svc, err := config.PeekService(act.ServiceName, grpc2.GRPCTAG)
+		if err != nil {
+			return fmt.Errorf("service %v: %v", act.ServiceName, err)
+		}
+		host = net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
+		hostMap.Store(act.ServiceName, host)
 	}
-	host := net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
 
-	act.uri.action = host + "/" + api.Path
+	act.uri.action = host.(string) + "/" + api.(*apimgrpb.API).Path
 
-	api, err = apimgrcli.GetServiceMethodAPI(ctx, act.ServiceName, act.Revert)
-	if err != nil || api == nil {
-		return fmt.Errorf("fail get service method api: %v", err)
+	api, ok = apiMap.Load(act.apiKey(act.Revert))
+	if !ok {
+		api, err = apimwcli.GetAPIOnly(ctx, &apimgrpb.Conds{
+			ServiceName: &commonpb.StringVal{Op: cruder.EQ, Value: act.ServiceName},
+			Path:        &commonpb.StringVal{Op: cruder.EQ, Value: act.Revert},
+		})
+		if err != nil || api == nil {
+			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Revert, err)
+		}
+		apiMap.Store(act.apiKey(act.Revert), api)
 	}
-	act.uri.revert = host + "/" + api.Path
+	act.uri.revert = host.(string) + "/" + api.(*apimgrpb.API).Path
 
 	return nil
 }
 
-func WithSaga(ctx context.Context, dispose *SagaDispose, pre, post func(ctx context.Context) error) error {
-	if pre != nil {
-		if err := pre(ctx); err != nil {
-			return fmt.Errorf("fail run pre: %v", err)
+func WithSaga(ctx context.Context, dispose *SagaDispose) error {
+	host, ok := hostMap.Load(constant.ServiceName)
+	if !ok {
+		svc, err := config.PeekService(constant.ServiceName, grpc2.GRPCTAG)
+		if err != nil {
+			return fmt.Errorf("service %v: %v", constant.ServiceName, err)
 		}
+		host = net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
+		hostMap.Store(constant.ServiceName, host)
 	}
 
-	svc, err := config.PeekService(constant.ServiceName, grpc2.GRPCTAG)
-	if err != nil {
-		return fmt.Errorf("fail peek dtm service: %v", err)
-	}
-
-	host := net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
-	gid := dtmgrpc.MustGenGid(host)
-	saga := dtmgrpc.NewSagaGrpc(host, gid)
+	gid := dtmgrpc.MustGenGid(host.(string))
+	saga := dtmgrpc.NewSagaGrpc(host.(string), gid)
 	for _, act := range dispose.Actions {
-		if err := act.ConstructURI(ctx); err != nil {
-			return fmt.Errorf("fail construct action uri: %v", err)
+		if err := act.constructURI(ctx); err != nil {
+			return fmt.Errorf("construct uri: %v", err)
 		}
-		saga = saga.Add(act.uri.action, act.uri.revert, act.Param)
+		saga = saga.Add(act.uri.action, act.uri.revert, act.Args)
 	}
 	saga.TransOptions = dispose.TransOptions
+	saga.SetConcurrent()
 
-	err = saga.Submit()
+	err := saga.Submit()
 	if err != nil {
-		return fmt.Errorf("fail run saga: %v", err)
+		return fmt.Errorf("saga: %v", err)
 	}
 
-	if post != nil {
-		return post(ctx)
-	}
 	return nil
 }
