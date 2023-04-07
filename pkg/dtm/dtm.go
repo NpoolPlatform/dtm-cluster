@@ -85,7 +85,7 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 		hostMap.Store(act.ServiceName, host)
 	}
 
-	act.uri.action = host.(string) + "/" + api.(apimgrpb.API).Path
+	act.uri.action = host.(string) + "/" + api.(*apimgrpb.API).Path
 
 	api, ok = apiMap.Load(act.apiKey(act.Revert))
 	if !ok {
@@ -98,7 +98,7 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 		}
 		apiMap.Store(act.apiKey(act.Revert), api)
 	}
-	act.uri.revert = host.(string) + "/" + api.(apimgrpb.API).Path
+	act.uri.revert = host.(string) + "/" + api.(*apimgrpb.API).Path
 
 	return nil
 }
