@@ -70,7 +70,7 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 			Path:        &commonpb.StringVal{Op: cruder.EQ, Value: act.Action},
 		})
 		if err != nil || api == nil {
-			return fmt.Errorf("fail get service method api: %v", err)
+			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Action, err)
 		}
 		apiMap.Store(act.apiKey(act.Action), api)
 	}
@@ -79,7 +79,7 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 	if !ok {
 		svc, err := config.PeekService(act.ServiceName, grpc2.GRPCTAG)
 		if err != nil {
-			return fmt.Errorf("fail peek dtm service: %v", err)
+			return fmt.Errorf("service %v: %v", act.ServiceName, err)
 		}
 		host = net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
 		hostMap.Store(act.ServiceName, host)
@@ -94,7 +94,7 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 			Path:        &commonpb.StringVal{Op: cruder.EQ, Value: act.Revert},
 		})
 		if err != nil || api == nil {
-			return fmt.Errorf("fail get service method api: %v", err)
+			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Action, err)
 		}
 		apiMap.Store(act.apiKey(act.Revert), api)
 	}
@@ -108,7 +108,7 @@ func WithSaga(ctx context.Context, dispose *SagaDispose) error {
 	if !ok {
 		svc, err := config.PeekService(constant.ServiceName, grpc2.GRPCTAG)
 		if err != nil {
-			return fmt.Errorf("fail peek dtm service: %v", err)
+			return fmt.Errorf("service %v: %v", constant.ServiceName, err)
 		}
 		host = net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
 		hostMap.Store(constant.ServiceName, host)
@@ -118,7 +118,7 @@ func WithSaga(ctx context.Context, dispose *SagaDispose) error {
 	saga := dtmgrpc.NewSagaGrpc(host.(string), gid)
 	for _, act := range dispose.Actions {
 		if err := act.constructURI(ctx); err != nil {
-			return fmt.Errorf("fail construct action uri: %v", err)
+			return fmt.Errorf("construct uri: %v", err)
 		}
 		saga = saga.Add(act.uri.action, act.uri.revert, act.Args)
 	}
@@ -126,7 +126,7 @@ func WithSaga(ctx context.Context, dispose *SagaDispose) error {
 
 	err := saga.Submit()
 	if err != nil {
-		return fmt.Errorf("fail run saga: %v", err)
+		return fmt.Errorf("saga: %v", err)
 	}
 
 	return nil
