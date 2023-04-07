@@ -94,7 +94,7 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 			Path:        &commonpb.StringVal{Op: cruder.EQ, Value: act.Revert},
 		})
 		if err != nil || api == nil {
-			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Action, err)
+			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Revert, err)
 		}
 		apiMap.Store(act.apiKey(act.Revert), api)
 	}
