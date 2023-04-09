@@ -18,6 +18,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: dtm-cluster-svc
+                name: dtm-cluster
                 port:
                   number: 36789
