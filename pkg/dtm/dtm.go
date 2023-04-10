@@ -17,8 +17,8 @@ import (
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
 
-	"github.com/dtm-labs/dtmcli/dtmimp"
-	"github.com/dtm-labs/dtmgrpc"
+	"github.com/dtm-labs/dtm/client/dtmcli/dtmimp"
+	"github.com/dtm-labs/dtm/client/dtmgrpc"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -41,6 +41,7 @@ type SagaDispose struct {
 }
 
 func NewSagaDispose(options dtmimp.TransOptions) *SagaDispose {
+	options.RetryLimit = 1
 	return &SagaDispose{
 		TransOptions: options,
 	}
