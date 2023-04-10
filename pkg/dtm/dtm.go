@@ -41,7 +41,9 @@ type SagaDispose struct {
 }
 
 func NewSagaDispose(options dtmimp.TransOptions) *SagaDispose {
-	options.RetryLimit = 1
+	if options.RetryLimit == 0 {
+		options.RetryLimit = 1
+	}
 	return &SagaDispose{
 		TransOptions: options,
 	}
