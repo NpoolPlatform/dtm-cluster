@@ -15,7 +15,7 @@ pipeline {
         sh '''
           mkdir -p .docker-tmp
           cp /usr/bin/consul .docker-tmp
-          docker build -t uhub.service.ucloud.cn/entropypool/dtm:1.8.4 .
+          docker build -t uhub.service.ucloud.cn/entropypool/dtm:1.17.1 .
         '''
       }
     }
@@ -28,13 +28,13 @@ pipeline {
         sh(returnStdout: true, script: '''
           set +e
           while true; do
-            docker push uhub.service.ucloud.cn/entropypool/dtm:1.8.4
+            docker push uhub.service.ucloud.cn/entropypool/dtm:1.17.1
             if [ $? -eq 0 ]; then
               break
             fi
             sleep 1;
           done
-          docker rmi uhub.service.ucloud.cn/entropypool/dtm:1.8.4
+          docker rmi uhub.service.ucloud.cn/entropypool/dtm:1.17.1
           set -e
         '''.stripIndent())
       }
