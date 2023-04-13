@@ -1,7 +1,7 @@
 create database if not exists dtm_barrier
 /*!40100 DEFAULT CHARACTER SET utf8mb4 */
 ;
-#drop table if exists dtm_barrier.barrier;
+drop table if exists dtm_barrier.barrier;
 create table if not exists dtm_barrier.barrier(
   id bigint(22) PRIMARY KEY AUTO_INCREMENT,
   trans_type varchar(45) default '',
