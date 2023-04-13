@@ -6,7 +6,7 @@ metadata:
   labels:
     app: dtm-cluster
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: dtm-cluster
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: dtm-cluster
-          image: yedf/dtm:1.17.1
+          image: uhub.service.ucloud.cn/entropypool/dtm:1.17.1
           imagePullPolicy: Always
           ports:
             - containerPort: 36789
