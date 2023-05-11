@@ -75,6 +75,9 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 		if err != nil || api == nil {
 			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Action, err)
 		}
+		if api.(*apimgrpb.API).Path == "" {
+			return fmt.Errorf("invalid api path: %v, %v", act.ServiceName, act.Action)
+		}
 		apiMap.Store(act.apiKey(act.Action), api)
 	}
 
@@ -98,6 +101,9 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 		})
 		if err != nil || api == nil {
 			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Revert, err)
+		}
+		if api.(*apimgrpb.API).Path == "" {
+			return fmt.Errorf("invalid api path: %v, %v", act.ServiceName, act.Revert)
 		}
 		apiMap.Store(act.apiKey(act.Revert), api)
 	}
