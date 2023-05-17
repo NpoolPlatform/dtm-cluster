@@ -3,7 +3,7 @@ module github.com/NpoolPlatform/dtm-cluster
 go 1.17
 
 require (
-	github.com/NpoolPlatform/basal-middleware v0.0.0-20230517042359-cf290be1d5e9
+	github.com/NpoolPlatform/basal-middleware v0.0.0-20230517094854-35503bc8201d
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20230509081417-267df92cab6d
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20220621110548-8f3f8049ecc5
 	github.com/NpoolPlatform/message v0.0.0-20230517035708-47983ef2390a
