@@ -12,10 +12,10 @@ import (
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 
 	apimwcli "github.com/NpoolPlatform/basal-middleware/pkg/client/api"
-	apimgrpb "github.com/NpoolPlatform/message/npool/basal/mgr/v1/api"
+	apimgrpb "github.com/NpoolPlatform/message/npool/basal/mw/v1/api"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	commonpb "github.com/NpoolPlatform/message/npool"
+	commonpb "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	"github.com/dtm-labs/dtm/client/dtmcli/dtmimp"
 	"github.com/dtm-labs/dtm/client/dtmgrpc"
