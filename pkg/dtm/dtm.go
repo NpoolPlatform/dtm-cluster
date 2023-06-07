@@ -68,16 +68,17 @@ func (act *Action) apiKey(action string) string {
 func (act *Action) constructURI(ctx context.Context) (err error) {
 	api, ok := apiMap.Load(act.apiKey(act.Action))
 	if !ok {
-		api, err = apimwcli.GetAPIOnly(ctx, &apimgrpb.Conds{
+		_api, err := apimwcli.GetAPIOnly(ctx, &apimgrpb.Conds{
 			ServiceName: &commonpb.StringVal{Op: cruder.EQ, Value: act.ServiceName},
 			Path:        &commonpb.StringVal{Op: cruder.EQ, Value: act.Action},
 		})
-		if err != nil || api == nil {
+		if err != nil || _api == nil {
 			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Action, err)
 		}
-		if api.(*apimgrpb.API).Path == "" {
+		if _api.Path == "" {
 			return fmt.Errorf("invalid api path: %v, %v", act.ServiceName, act.Action)
 		}
+		api = _api
 		apiMap.Store(act.apiKey(act.Action), api)
 	}
 
@@ -95,16 +96,17 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 
 	api, ok = apiMap.Load(act.apiKey(act.Revert))
 	if !ok {
-		api, err = apimwcli.GetAPIOnly(ctx, &apimgrpb.Conds{
+		_api, err := apimwcli.GetAPIOnly(ctx, &apimgrpb.Conds{
 			ServiceName: &commonpb.StringVal{Op: cruder.EQ, Value: act.ServiceName},
 			Path:        &commonpb.StringVal{Op: cruder.EQ, Value: act.Revert},
 		})
-		if err != nil || api == nil {
+		if err != nil || _api == nil {
 			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Revert, err)
 		}
-		if api.(*apimgrpb.API).Path == "" {
+		if _api.Path == "" {
 			return fmt.Errorf("invalid api path: %v, %v", act.ServiceName, act.Revert)
 		}
+		api = _api
 		apiMap.Store(act.apiKey(act.Revert), api)
 	}
 	act.uri.revert = host.(string) + "/" + api.(*apimgrpb.API).Path
