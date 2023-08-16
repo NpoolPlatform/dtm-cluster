@@ -22,7 +22,6 @@ pipeline {
       }
     }
 
-    stage('Generate docker image for development') {
     stage('Build dtm image') {
       when {
         expression { BUILD_TARGET == 'true' }
