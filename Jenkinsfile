@@ -7,9 +7,26 @@ pipeline {
       }
     }
 
+    stage('Generate docker image for feature') {
+      when {
+        expression { BUILD_TARGET == 'true' }
+        expression { BRANCH_NAME != 'master' }
+      }
+      steps {
+        sh(returnStdout: false, script: '''
+          feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
+          mkdir -p .docker-tmp
+          cp /usr/bin/consul .docker-tmp
+          docker build -t uhub.service.ucloud.cn/entropypool/dtm:$feature_name .
+        '''.stripIndent())
+      }
+    }
+
+    stage('Generate docker image for development') {
     stage('Build dtm image') {
       when {
         expression { BUILD_TARGET == 'true' }
+        expression { BRANCH_NAME == 'master' }
       }
       steps {
         sh '''
@@ -20,7 +37,30 @@ pipeline {
       }
     }
 
-    stage('Release dtm image') {
+    stage('Release docker image for feature') {
+      when {
+        expression { RELEASE_TARGET == 'true' }
+        expression { BRANCH_NAME != 'master' }
+      }
+      steps {
+        sh(returnStdout: false, script: '''
+          feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
+          set +e
+          docker images | grep dtm | grep $feature_name
+          rc=$?
+          set -e
+          if [ 0 -eq $rc ]; then
+            docker push uhub.service.ucloud.cn/entropypool/dtm:$feature_name
+          fi
+          images=`docker images | grep entropypool | grep dtm | grep none | awk '{ print $3 }'`
+          for image in $images; do
+            docker rmi $image -f
+          done
+        '''.stripIndent())
+      }
+    }
+
+    stage('Release docker image for development') {
       when {
         expression { RELEASE_TARGET == 'true' }
       }
@@ -46,9 +86,24 @@ pipeline {
       }
     }
 
+    stage('Deploy dtm cluster for feature') {
+      when {
+        expression { DEPLOY_TARGET == 'true' }
+        expression { BRANCH_NAME != 'master' }
+      }
+      steps {
+        sh(returnStdout: false, script: '''
+        feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
+        sed -i "s#/image: uhub.service.ucloud.cn/entropypool/dtm(*)#image: uhub.service.ucloud.cn/entropypool/dtm:$feature_names#g" k8s/01-deployment.yaml
+        sed -i "s/dtm.development.npool.top/dtm.$TARGET_ENV.npool.top/g" ./k8s/03-traefik-vpn-ingress.yaml
+        kubectl apply -k k8s
+        '''.stripIndent())
+      }
+    }
     stage('Deploy dtm cluster') {
       when {
         expression { DEPLOY_TARGET == 'true' }
+        expression { BRANCH_NAME == 'master' }
       }
       steps {
         sh 'sed -i "s/dtm.development.npool.top/dtm.$TARGET_ENV.npool.top/g" ./k8s/03-traefik-vpn-ingress.yaml'
