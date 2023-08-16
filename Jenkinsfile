@@ -29,9 +29,10 @@ pipeline {
       }
       steps {
         sh '''
+          tag=1.17.1.1
           mkdir -p .docker-tmp
           cp /usr/bin/consul .docker-tmp
-          docker build -t uhub.service.ucloud.cn/entropypool/dtm:1.17.1.1 .
+          docker build -t uhub.service.ucloud.cn/entropypool/dtm:$tag .
         '''
       }
     }
@@ -59,22 +60,24 @@ pipeline {
       }
     }
 
-    stage('Release docker image for development') {
+    stage('Release docker image') {
       when {
         expression { RELEASE_TARGET == 'true' }
       }
       steps {
         sh(returnStdout: true, script: '''
+          tag=1.17.1.1
           set +e
-          while true; do
-            docker push uhub.service.ucloud.cn/entropypool/dtm:1.17.1.1
-            if [ $? -eq 0 ]; then
-              break
-            fi
-            sleep 1;
-          done
-          docker rmi uhub.service.ucloud.cn/entropypool/dtm:1.17.1.1
+          docker images | grep dtm | grep $tag
+          rc=$?
           set -e
+          if [ 0 -eq $rc ]; then
+            docker push uhub.service.ucloud.cn/entropypool/dtm:$tag
+          fi
+          images=`docker images | grep entropypool | grep dtm | grep none | awk '{ print $3 }'`
+          for image in $images; do
+            docker rmi $image -f
+          done
         '''.stripIndent())
       }
     }
