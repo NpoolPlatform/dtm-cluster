@@ -93,7 +93,7 @@ pipeline {
       steps {
         sh(returnStdout: false, script: '''
         feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
-        sed -i "s#/image: uhub.service.ucloud.cn/entropypool/dtm(*)#image: uhub.service.ucloud.cn/entropypool/dtm:$feature_name#g" k8s/01-deployment.yaml
+        sed -ri 's#image: uhub.service.ucloud.cn/entropypool/dtm(.*)#image: uhub.service.ucloud.cn/entropypool/dtm:jenkinsfile-update#g' k8s/01-deployment.yaml
         sed -i "s/dtm.development.npool.top/dtm.$TARGET_ENV.npool.top/g" ./k8s/03-traefik-vpn-ingress.yaml
         kubectl apply -k k8s
         '''.stripIndent())
