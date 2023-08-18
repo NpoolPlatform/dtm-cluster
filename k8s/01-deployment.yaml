@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: dtm-cluster
-          image: uhub.service.ucloud.cn/entropypool/dtm:1.17.1.1
+          image: uhub.service.ucloud.cn/entropypool/dtm:1.17.1.2
           imagePullPolicy: Always
           ports:
             - containerPort: 36789
