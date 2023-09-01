@@ -93,6 +93,9 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 	}
 
 	act.uri.action = host.(string) + "/" + api.(*apimgrpb.API).Path
+	if act.Revert == "" {
+		return nil
+	}
 
 	api, ok = apiMap.Load(act.apiKey(act.Revert))
 	if !ok {
