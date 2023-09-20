@@ -4,3 +4,6 @@ Store:
   Port: PORT
   User: root
   Password: PWD
+  MaxOpenConns: 2
+  MaxIdleConns: 1
+  ConnMaxLifeTime: 3
