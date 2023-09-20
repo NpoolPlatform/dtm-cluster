@@ -7,3 +7,4 @@ Store:
   MaxOpenConns: 2
   MaxIdleConns: 1
   ConnMaxLifeTime: 3
+  TransCronInterval: 10
