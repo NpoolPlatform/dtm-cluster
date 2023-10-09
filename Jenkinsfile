@@ -29,7 +29,7 @@ pipeline {
       }
       steps {
         sh '''
-          tag=1.17.1.6
+          tag=1.17.1.7
           mkdir -p .docker-tmp
           cp /usr/bin/consul .docker-tmp
           docker build -t uhub.service.ucloud.cn/entropypool/dtm:$tag .
@@ -66,7 +66,7 @@ pipeline {
       }
       steps {
         sh(returnStdout: true, script: '''
-          tag=1.17.1.6
+          tag=1.17.1.7
           set +e
           docker images | grep dtm | grep $tag
           rc=$?
