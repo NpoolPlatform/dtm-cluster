@@ -11,3 +11,4 @@ RequestTimeout: 1200
 TimeoutToFail: 1200
 RetryInterval: 1200
 TransCronInterval: 1200
+LogLevel: 'debug'
