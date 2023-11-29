@@ -1,7 +1,7 @@
 FROM uhub.service.ucloud.cn/entropypool_public/dtm:1.17.1
 
 RUN apk add --no-cache curl jq mysql-client
-1
+
 COPY config.yaml /app/dtm/configs/
 COPY ./sqls /
 COPY .docker-tmp/consul docker-entrypoint.sh /usr/local/bin/
