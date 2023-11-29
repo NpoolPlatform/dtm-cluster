@@ -7,8 +7,9 @@ Store:
   MaxOpenConns: 2
   MaxIdleConns: 1
   ConnMaxLifeTime: 3
-RequestTimeout: 1200
-TimeoutToFail: 1200
-RetryInterval: 1200
-TransCronInterval: 1200
+RequestTimeout: 10
+TimeoutToFail: 10
+RetryInterval: 10
+RetryLimit: 0
+TransCronInterval: 3
 LogLevel: 'debug'
