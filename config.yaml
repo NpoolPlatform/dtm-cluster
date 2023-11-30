@@ -12,4 +12,4 @@ TimeoutToFail: 10
 RetryInterval: 10
 RetryLimit: 0
 TransCronInterval: 3
-LogLevel: 'debug'
+LogLevel: 'info'
