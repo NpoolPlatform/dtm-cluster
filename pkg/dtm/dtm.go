@@ -10,6 +10,7 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 
 	apimwcli "github.com/NpoolPlatform/basal-middleware/pkg/client/api"
 	apimgrpb "github.com/NpoolPlatform/message/npool/basal/mw/v1/api"
@@ -70,10 +71,10 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 			Path:        &commonpb.StringVal{Op: cruder.EQ, Value: act.Action},
 		})
 		if err != nil || _api == nil {
-			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Action, err)
+			return wlog.Errorf("service %v api %v: %v", act.ServiceName, act.Action, err)
 		}
 		if _api.Path == "" {
-			return fmt.Errorf("invalid api path: %v, %v", act.ServiceName, act.Action)
+			return wlog.Errorf("invalid api path: %v, %v", act.ServiceName, act.Action)
 		}
 		api = _api
 		apiMap.Store(act.apiKey(act.Action), api)
@@ -83,7 +84,7 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 	if !ok {
 		svc, err := config.PeekService(act.ServiceName, grpc2.GRPCTAG)
 		if err != nil {
-			return fmt.Errorf("service %v: %v", act.ServiceName, err)
+			return wlog.Errorf("service %v: %v", act.ServiceName, err)
 		}
 		host = net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
 		hostMap.Store(act.ServiceName, host)
@@ -101,10 +102,10 @@ func (act *Action) constructURI(ctx context.Context) (err error) {
 			Path:        &commonpb.StringVal{Op: cruder.EQ, Value: act.Revert},
 		})
 		if err != nil || _api == nil {
-			return fmt.Errorf("service %v api %v: %v", act.ServiceName, act.Revert, err)
+			return wlog.Errorf("service %v api %v: %v", act.ServiceName, act.Revert, err)
 		}
 		if _api.Path == "" {
-			return fmt.Errorf("invalid api path: %v, %v", act.ServiceName, act.Revert)
+			return wlog.Errorf("invalid api path: %v, %v", act.ServiceName, act.Revert)
 		}
 		api = _api
 		apiMap.Store(act.apiKey(act.Revert), api)
@@ -119,7 +120,7 @@ func WithSaga(ctx context.Context, dispose *SagaDispose) error {
 	if !ok {
 		svc, err := config.PeekService(constant.ServiceName, grpc2.GRPCTAG)
 		if err != nil {
-			return fmt.Errorf("service %v: %v", constant.ServiceName, err)
+			return wlog.Errorf("service %v: %v", constant.ServiceName, err)
 		}
 		host = net.JoinHostPort(svc.Address, fmt.Sprintf("%v", svc.Port))
 		hostMap.Store(constant.ServiceName, host)
@@ -129,7 +130,7 @@ func WithSaga(ctx context.Context, dispose *SagaDispose) error {
 	saga := dtmgrpc.NewSagaGrpc(host.(string), gid)
 	for _, act := range dispose.Actions {
 		if err := act.constructURI(ctx); err != nil {
-			return fmt.Errorf("construct uri: %v", err)
+			return wlog.Errorf("construct uri: %v", err)
 		}
 		saga = saga.Add(act.uri.action, act.uri.revert, act.Args)
 	}
@@ -137,7 +138,7 @@ func WithSaga(ctx context.Context, dispose *SagaDispose) error {
 
 	err := saga.Submit()
 	if err != nil {
-		return fmt.Errorf("saga: %v", err)
+		return wlog.Errorf("saga: %v", err)
 	}
 
 	return nil
